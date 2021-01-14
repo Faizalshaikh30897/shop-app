@@ -7,13 +7,12 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList
+  FlatList,
 } from "react-native";
 import {
-  NavigationDrawerOptions,
-  NavigationDrawerScreenComponent,
-  NavigationDrawerScreenProps,
-} from "react-navigation-drawer";
+  DrawerScreenProps,
+  DrawerNavigationOptions,
+} from "@react-navigation/drawer";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../App";
@@ -23,18 +22,11 @@ import COLORS from "../../constants/colors";
 import Product from "../../models/product";
 import { addToCart } from "../../store/actions/cart";
 import { fetchProducts } from "../../store/actions/product";
+import { ProductStackParamList } from "../../navigation/MainNavigator";
 
-interface NavigationProps {}
+type Props = DrawerScreenProps<ProductStackParamList, "ProductsOverView">;
 
-interface ScreenProps {}
-
-interface Props
-  extends NavigationDrawerScreenProps<NavigationProps, ScreenProps> {}
-
-const ProductsOverviewScreen: NavigationDrawerScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+const ProductsOverviewScreen = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
@@ -46,27 +38,26 @@ const ProductsOverviewScreen: NavigationDrawerScreenComponent<
     setError(undefined);
     try {
       await dispatch(fetchProducts());
-      
     } catch (err) {
       setError(err.message);
     }
     setIsRefreshing(false);
-  },[setIsRefreshing,dispatch]);
+  }, [setIsRefreshing, dispatch]);
 
-  useEffect(()=>{
-    const willFocusSub = props.navigation.addListener("willFocus",loadProducts);
-    return ()=>{
-      willFocusSub.remove();
-    }
-  },[loadProducts])
+  useEffect(() => {
+    props.navigation.addListener("focus", loadProducts);
+    return () => {
+      props.navigation.removeListener("focus", loadProducts);
+      // willFocusSub.remove();
+    };
+  }, [loadProducts]);
 
   useEffect(() => {
     setIsLoading(true);
-    loadProducts().then(()=>{
+    loadProducts().then(() => {
       setIsLoading(false);
     });
   }, [dispatch, loadProducts, setIsLoading]);
-
 
   const availableProducts = useSelector(
     (state: RootState) => state.products.availableProducts
@@ -78,7 +69,7 @@ const ProductsOverviewScreen: NavigationDrawerScreenComponent<
 
   const selectProductHandler = (product: Product) => {
     props.navigation.navigate({
-      routeName: "Product",
+      name: "Product",
       params: {
         productId: product.id,
         productTitle: product.title,
@@ -98,7 +89,11 @@ const ProductsOverviewScreen: NavigationDrawerScreenComponent<
     return (
       <View style={styles.indicator}>
         <Text>Something went wrong!</Text>
-        <Button color={COLORS.primary} title="TRY AGAIN" onPress={loadProducts} />
+        <Button
+          color={COLORS.primary}
+          title="TRY AGAIN"
+          onPress={loadProducts}
+        />
       </View>
     );
   }
@@ -145,8 +140,8 @@ const ProductsOverviewScreen: NavigationDrawerScreenComponent<
     />
   );
 };
-
-ProductsOverviewScreen.navigationOptions = (navigationData) => {
+// DrawerNavigationOptions
+export const ProductOverviewScreenNavigationOptions = (navigationData: any) => {
   return {
     headerTitle: "Products",
     headerRight: () => {
@@ -156,9 +151,7 @@ ProductsOverviewScreen.navigationOptions = (navigationData) => {
             iconName={Platform.OS === "android" ? "md-cart" : "ios-cart"}
             title="Go to Cart"
             onPress={() => {
-              navigationData.navigation.navigate({
-                routeName: "Cart",
-              });
+              navigationData.navigation.navigate("Cart",{});
             }}
           />
         </HeaderButtons>
@@ -177,7 +170,7 @@ ProductsOverviewScreen.navigationOptions = (navigationData) => {
         </HeaderButtons>
       );
     },
-  } as NavigationDrawerOptions;
+  };
 };
 
 export default ProductsOverviewScreen;

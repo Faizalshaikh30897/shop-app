@@ -1,3 +1,5 @@
+import { RouteProp } from "@react-navigation/native";
+import { StackNavigationOptions, StackNavigationProp } from "@react-navigation/stack";
 import React, { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -10,31 +12,28 @@ import {
   Platform,
 } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps,
-} from "react-navigation-stack";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../App";
 import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 import COLORS from "../../constants/colors";
 import Product from "../../models/Product";
+import { ProductStackParamList } from "../../navigation/MainNavigator";
 import { addToCart } from "../../store/actions/cart";
-import { productReducer } from "../../store/reducers/product";
 
-interface NavigationProps {
-  productId: string;
-  productTitle: string;
-}
+type ProfileScreenRouteProp = RouteProp<ProductStackParamList, "Product">;
 
-interface ScreenProps {}
-interface Props
-  extends NavigationStackScreenProps<NavigationProps, ScreenProps> {}
+type ProfileScreenNavigationProp = StackNavigationProp<
+  ProductStackParamList,
+  "Product"
+>;
 
-const ProductDetailsScreen: NavigationStackScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+type Props = {
+  route: ProfileScreenRouteProp;
+  navigation: ProfileScreenNavigationProp;
+};
+
+const ProductDetailsScreen = (props: Props) => {
   const [screenHeight, setScreenHeight] = useState(
     Dimensions.get("window").height
   );
@@ -56,7 +55,7 @@ const ProductDetailsScreen: NavigationStackScreenComponent<
 
   const product: Product = useSelector((state: RootState) => {
     return state.products.availableProducts.find(
-      (productItem) => productItem.id === props.navigation.getParam("productId")
+      (productItem) => productItem.id === props.route.params.productId
     );
   })!;
 
@@ -89,19 +88,17 @@ const ProductDetailsScreen: NavigationStackScreenComponent<
   );
 };
 
-ProductDetailsScreen.navigationOptions = (navigationData) => {
+export const ProductDetailsScreenNavigationOptions =  (navigationData: any): StackNavigationOptions  => {
   return {
-    headerTitle: navigationData.navigation.getParam("productTitle"),
+    headerTitle: navigationData.route.params.productTitle,
     headerRight: () => {
       return (
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
           <Item
-            iconName={Platform.OS === "android" ? "md-cart" :"ios-cart"}
+            iconName={Platform.OS === "android" ? "md-cart" : "ios-cart"}
             title="Go to Cart"
             onPress={() => {
-              navigationData.navigation.navigate({
-                routeName: "Cart",
-              });
+              navigationData.navigation.navigate("Cart",{});
             }}
           />
         </HeaderButtons>

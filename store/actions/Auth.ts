@@ -7,6 +7,7 @@ export const SIGN_UP = "SIGN_UP";
 export const LOGIN = "LOGIN";
 export const AUTHENTICATE = "AUTHENTICATE";
 export const LOGOUT = "LOGOUT";
+export const SET_DID_TRY_AL = "SET_DID_TRY_AL"; 
 
 let timer: NodeJS.Timeout;
 
@@ -28,6 +29,11 @@ interface AuthenticateAction {
   userId: string;
 }
 
+interface SetDidTryALAction {
+  type: typeof SET_DID_TRY_AL;
+  
+}
+
 interface LogoutAction {
   type: typeof LOGOUT;
 }
@@ -36,7 +42,8 @@ export type AuthActionType =
   | SignUpAction
   | LoginAction
   | AuthenticateAction
-  | LogoutAction;
+  | LogoutAction
+  | SetDidTryALAction;
 
 const APIKey = "AIzaSyDOcJto57RzDgLbCpX1cS0OWm_pBnYbzLc";
 
@@ -158,6 +165,12 @@ export const logout = (): LogoutAction => {
   clearLogoutTimer();
   return { type: LOGOUT };
 };
+
+export const setDidTryAL = () : SetDidTryALAction =>{
+  return {
+    type: SET_DID_TRY_AL
+  }
+}
 
 const setLogoutTimer = (expiryTime: number) => {
   return (dispatch: any) => {

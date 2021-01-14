@@ -1,3 +1,4 @@
+import { DrawerScreenProps } from "@react-navigation/drawer";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,35 +8,25 @@ import {
   StyleSheet,
   Text,
   View,
+  FlatList
 } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import { HeaderButtons } from "react-navigation-header-buttons";
-import {
-  NavigationStackScreenProps,
-  NavigationStackScreenComponent,
-} from "react-navigation-stack";
+import { ScreenProps } from "react-native-screens";
+
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../App";
 import CartItem from "../../components/shop/CartItem";
 import COLORS from "../../constants/colors";
 
 import CartItemDetail from "../../models/_CartItemDetail";
+import { ProductStackParamList } from "../../navigation/MainNavigator";
 import { deleteFromCart, emptyCart } from "../../store/actions/cart";
 import { placeOrder } from "../../store/actions/orders";
 
-interface NavigationProps {
-  productId: string;
-  productTitle: string;
-}
 
-interface ScreenProps {}
-interface Props
-  extends NavigationStackScreenProps<NavigationProps, ScreenProps> {}
+type Props = DrawerScreenProps<ProductStackParamList, 'Cart'>;
 
-const CartScreen: NavigationStackScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+const CartScreen = (props: Props) => {
   const { items, totalAmount } = useSelector((state: RootState) => {
     const itemsAsArray: CartItemDetail[] = [];
     state.cart.items.forEach((value, key) => {
@@ -128,7 +119,7 @@ const CartScreen: NavigationStackScreenComponent<
   );
 };
 
-CartScreen.navigationOptions = (navigationData) => {
+export const CartScreenNavigationOptions =  (navigationData:any) => {
   return {
     headerTitle: "Your Cart",
   };

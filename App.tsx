@@ -6,12 +6,11 @@ import { Provider } from "react-redux";
 import { productReducer, ProductState } from "./store/reducers/product";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-import ShopNavigator from "./navigation/shopNavigator";
 import { cartReducer, CartState } from "./store/reducers/cart";
 import { ordersReducer, OrdersState } from "./store/reducers/orders";
 import ReduxThunk  from "redux-thunk";
 import { authReducer, AuthState } from "./store/reducers/Auth";
-import NavigationContainer from "./navigation/NavigationContainer";
+import AppNavigator from "./navigation/AppNavigator";
 
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs();//Ignore all log notifications
@@ -58,7 +57,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer />
+      <AppNavigator />
     </Provider>
   );
 }

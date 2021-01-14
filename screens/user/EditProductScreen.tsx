@@ -1,3 +1,5 @@
+import { RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import {
   ScrollView,
@@ -15,10 +17,6 @@ import {
 } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps,
-} from "react-navigation-stack";
 import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "../../App";
@@ -27,16 +25,20 @@ import Input from "../../components/UI/Input";
 import COLORS from "../../constants/colors";
 
 import Product from "../../models/Product";
+import { UserStackParamList } from "../../navigation/MainNavigator";
 import { addProduct, editProduct } from "../../store/actions/product";
 
-interface NavigationProps {
-  productId?: string;
-  saveProduct: () => void;
-}
+type ProfileScreenRouteProp = RouteProp<UserStackParamList, "EditProduct">;
 
-interface ScreenProps {}
-interface Props
-  extends NavigationStackScreenProps<NavigationProps, ScreenProps> {}
+type ProfileScreenNavigationProp = StackNavigationProp<
+  UserStackParamList,
+  "EditProduct"
+>;
+
+type Props = {
+  route: ProfileScreenRouteProp;
+  navigation: ProfileScreenNavigationProp;
+};
 
 interface InputValues {
   title: string;
@@ -96,11 +98,8 @@ const formReducer = (
   }
 };
 
-const EditProductScreen: NavigationStackScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
-  const prodId = props.navigation.getParam("productId");
+const EditProductScreen = (props: Props) => {
+  const prodId = props.route.params?.productId;
 
   const editedProduct: Product = useSelector((state: RootState) => {
     return state.products.userProducts.find((prod) => prod.id === prodId);
@@ -190,9 +189,24 @@ const EditProductScreen: NavigationStackScreenComponent<
   }, [dispatch, editedProduct, state]);
 
   useEffect(() => {
-    props.navigation.setParams({
-      saveProduct: addUpdateProductHandler,
-    });
+    props.navigation.setOptions({
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+            <Item
+              iconName={
+                Platform.OS === "android" ? "md-checkmark" : "ios-checkmark"
+              }
+              title="Save"
+              onPress={addUpdateProductHandler}
+            />
+          </HeaderButtons>
+        );
+      },
+    })
+    // props.navigation.setParams({
+    //   saveProduct: addUpdateProductHandler,
+    // });
     return () => {
       return;
     };
@@ -281,24 +295,12 @@ const EditProductScreen: NavigationStackScreenComponent<
   );
 };
 
-EditProductScreen.navigationOptions = (navigationData) => {
+export const EditProductScreenNavigationOptions = (navigationData: any) => {
   return {
-    headerTitle: navigationData.navigation.getParam("productId")
+    headerTitle: navigationData.route.params?.productId
       ? "Edit Product"
       : "Add Product",
-    headerRight: () => {
-      return (
-        <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-          <Item
-            iconName={
-              Platform.OS === "android" ? "md-checkmark" : "ios-checkmark"
-            }
-            title="Save"
-            onPress={navigationData.navigation.getParam("saveProduct")}
-          />
-        </HeaderButtons>
-      );
-    },
+   
   };
 };
 

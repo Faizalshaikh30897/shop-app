@@ -9,23 +9,14 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps,
-} from "react-navigation-stack";
 import Card from "../../components/UI/Card";
 import Input from "../../components/UI/Input";
 import COLORS from "../../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch } from "react-redux";
 import { login, signup } from "../../store/actions/Auth";
-
-interface NavigationProps {}
-
-interface ScreenProps {}
-interface Props
-  extends NavigationStackScreenProps<NavigationProps, ScreenProps> {}
+import { AuthStackParamList } from "../../navigation/MainNavigator";
+import { StackScreenProps } from "@react-navigation/stack";
 
 interface InputValues {
   email: string;
@@ -78,10 +69,9 @@ const formReducer = (
   }
 };
 
-const AuthScreen: NavigationStackScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+type Props = StackScreenProps<AuthStackParamList, "Auth">;
+
+const AuthScreen= (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined | null>();
 
@@ -149,9 +139,7 @@ const AuthScreen: NavigationStackScreenComponent<
 
     try {
       await dispatch(action);
-      props.navigation.navigate({
-        routeName: "Shop"
-      })
+      // props.navigation.navigate("Shop",{})
     } catch (err) {
       setError(err.message);
       setIsLoading(false);
@@ -225,7 +213,7 @@ const AuthScreen: NavigationStackScreenComponent<
   );
 };
 
-AuthScreen.navigationOptions = (navigationData) => {
+export const AuthScreenNavigationOptions = (navigationData:any) => {
   return {
     headerTitle: "Login",
   };

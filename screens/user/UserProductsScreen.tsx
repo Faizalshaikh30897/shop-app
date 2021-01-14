@@ -1,3 +1,4 @@
+import { DrawerScreenProps } from "@react-navigation/drawer";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,11 +11,6 @@ import {
   Text,
   FlatList,
 } from "react-native";
-import {
-  NavigationDrawerOptions,
-  NavigationDrawerScreenComponent,
-  NavigationDrawerScreenProps,
-} from "react-navigation-drawer";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../App";
@@ -22,19 +18,12 @@ import ProductItem from "../../components/shop/ProductItem";
 import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 import COLORS from "../../constants/colors";
 import Product from "../../models/Product";
+import { UserStackParamList } from "../../navigation/MainNavigator";
 import { deleteProduct, fetchProducts } from "../../store/actions/product";
 
-interface NavigationProps {}
+type Props = DrawerScreenProps<UserStackParamList, "UserProducts">;
 
-interface ScreenProps {}
-
-interface Props
-  extends NavigationDrawerScreenProps<NavigationProps, ScreenProps> {}
-
-const UserProductsScreen: NavigationDrawerScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+const UserProductsScreen = (props: Props) => {
   const userProducts = useSelector(
     (state: RootState) => state.products.userProducts
   );
@@ -57,12 +46,9 @@ const UserProductsScreen: NavigationDrawerScreenComponent<
   }, [setIsRefreshing, dispatch]);
 
   useEffect(() => {
-    const willFocusSub = props.navigation.addListener(
-      "willFocus",
-      loadProducts
-    );
+    props.navigation.addListener("focus", loadProducts);
     return () => {
-      willFocusSub.remove();
+      props.navigation.removeListener("focus", loadProducts);
     };
   }, [loadProducts]);
 
@@ -74,11 +60,8 @@ const UserProductsScreen: NavigationDrawerScreenComponent<
   }, [dispatch, loadProducts, setIsLoading]);
 
   const selectProducHandler = (product: Product) => {
-    props.navigation.navigate({
-      routeName: "EditProduct",
-      params: {
-        productId: product.id,
-      },
+    props.navigation.navigate("EditProduct", {
+      productId: product.id,
     });
   };
 
@@ -176,7 +159,7 @@ const UserProductsScreen: NavigationDrawerScreenComponent<
   );
 };
 
-UserProductsScreen.navigationOptions = (navigationData) => {
+export const UserProductsScreenNavigationOptions = (navigationData: any) => {
   return {
     headerTitle: "Your Products",
     headerLeft: () => {
@@ -199,15 +182,13 @@ UserProductsScreen.navigationOptions = (navigationData) => {
             iconName={Platform.OS === "android" ? "md-create" : "ios-create"}
             title="Add"
             onPress={() => {
-              navigationData.navigation.navigate({
-                routeName: "EditProduct",
-              });
+              navigationData.navigation.navigate("EditProduct",{});
             }}
           />
         </HeaderButtons>
       );
     },
-  } as NavigationDrawerOptions;
+  };
 };
 
 export default UserProductsScreen;

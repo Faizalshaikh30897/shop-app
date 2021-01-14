@@ -1,49 +1,41 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StackScreenProps } from "@react-navigation/stack";
 import React, { useEffect } from "react";
 import { StyleSheet, ActivityIndicator, View } from "react-native";
 
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps,
-} from "react-navigation-stack";
 import { useDispatch } from "react-redux";
 import COLORS from "../constants/colors";
-import { authenticate } from "../store/actions/Auth";
+import { authenticate, setDidTryAL } from "../store/actions/Auth";
 
-interface NavigationProps {}
+type Props = {};
 
-interface ScreenProps {}
-interface Props
-  extends NavigationStackScreenProps<NavigationProps, ScreenProps> {}
-
-const StartupScreen: NavigationStackScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+const StartupScreen = (props: Props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const startupCheck = async () => {
       const data = await AsyncStorage.getItem("userData");
       if (!data) {
-        props.navigation.navigate({
-          routeName: "Auth",
-        });
+        // props.navigation.navigate({
+        //   routeName: "Auth",
+        // });
+        dispatch(setDidTryAL());
         return;
       }
       const { userId, token, expiryDate } = JSON.parse(data);
       if (new Date(expiryDate) <= new Date() || !token || !userId) {
-        props.navigation.navigate({
-          routeName: "Auth",
-        });
+        // props.navigation.navigate({
+        //   routeName: "Auth",
+        // });
+        dispatch(setDidTryAL());
         return;
       }
       const expiresIn = new Date(expiryDate).getTime() - new Date().getTime()
 
       dispatch(authenticate(token,userId,expiresIn));
-      props.navigation.navigate({
-        routeName: "Shop",
-      });
+      // props.navigation.navigate({
+      //   routeName: "Shop",
+      // });
     };
 
     startupCheck();

@@ -1,3 +1,4 @@
+import { DrawerScreenProps } from "@react-navigation/drawer";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,11 +11,6 @@ import {
   FlatList
 } from "react-native";
 
-import {
-  NavigationDrawerOptions,
-  NavigationDrawerScreenComponent,
-  NavigationDrawerScreenProps,
-} from "react-navigation-drawer";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../App";
@@ -23,19 +19,12 @@ import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
 import COLORS from "../../constants/colors";
 
 import Order from "../../models/Order";
+import { OrderStackParamList } from "../../navigation/MainNavigator";
 import { fetchOrders } from "../../store/actions/orders";
 
-interface NavigationProps {}
+type Props = DrawerScreenProps<OrderStackParamList, "Orders">;
 
-interface ScreenProps {}
-
-interface Props
-  extends NavigationDrawerScreenProps<NavigationProps, ScreenProps> {}
-
-const OrdersScreen: NavigationDrawerScreenComponent<
-  NavigationProps,
-  ScreenProps
-> = (props: Props) => {
+const OrdersScreen = (props: Props) => {
   const orders: Order[] = useSelector(
     (state: RootState) => state.orders.orders
   );
@@ -58,9 +47,9 @@ const OrdersScreen: NavigationDrawerScreenComponent<
   }, [dispatch, setIsRefreshing]);
 
   useEffect(() => {
-    const willFocusSub = props.navigation.addListener("willFocus", loadOrders);
+    props.navigation.addListener("focus", loadOrders);
     return () => {
-      willFocusSub.remove();
+      props.navigation.removeListener("focus",loadOrders);
     };
   }, [loadOrders]);
 
@@ -108,7 +97,7 @@ const OrdersScreen: NavigationDrawerScreenComponent<
   );
 };
 
-OrdersScreen.navigationOptions = (navigationData) => {
+export const OrdersScreenNavigationOptions =  (navigationData: any) => {
   return {
     headerTitle: "Orders",
     headerLeft: () => {
@@ -124,7 +113,7 @@ OrdersScreen.navigationOptions = (navigationData) => {
         </HeaderButtons>
       );
     },
-  } as NavigationDrawerOptions;
+  };
 };
 
 export default OrdersScreen;
