@@ -136,7 +136,7 @@ const EditProductScreen = (props: Props) => {
 
   const addUpdateProductHandler = useCallback(async () => {
     if (!state.isFormValid) {
-      console.log("state invalid ", JSON.stringify(state));
+      
       Alert.alert(
         "Wrong Input!",
         "Please Check all the fields and Fill them properly.",
@@ -161,7 +161,8 @@ const EditProductScreen = (props: Props) => {
               state.inputValues.title,
               state.inputValues.imageUrl,
               state.inputValues.description,
-              editedProduct.price
+              editedProduct.price,
+              editedProduct.ownerToken
             )
           )
         );
@@ -174,7 +175,8 @@ const EditProductScreen = (props: Props) => {
               state.inputValues.title,
               state.inputValues.imageUrl,
               state.inputValues.description,
-              Number(state.inputValues.price)
+              Number(state.inputValues.price),
+              null
             )
           )
         );
@@ -214,7 +216,7 @@ const EditProductScreen = (props: Props) => {
 
   const inputChangeHandler = useCallback(
     (value: string, isValid: boolean, input: string) => {
-      console.log(`updating form for ${input} validity is ${isValid}`);
+      
       formStateDispatch({
         type: FORM_INPUT_UPDATE,
         input,

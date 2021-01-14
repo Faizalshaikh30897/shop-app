@@ -17,7 +17,7 @@ import { useDispatch } from "react-redux";
 import { login, signup } from "../../store/actions/Auth";
 import { AuthStackParamList } from "../../navigation/MainNavigator";
 import { StackScreenProps } from "@react-navigation/stack";
-
+import * as Notifications from "expo-notifications";
 interface InputValues {
   email: string;
   password: string;
@@ -71,7 +71,7 @@ const formReducer = (
 
 type Props = StackScreenProps<AuthStackParamList, "Auth">;
 
-const AuthScreen= (props: Props) => {
+const AuthScreen = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined | null>();
 
@@ -89,19 +89,19 @@ const AuthScreen= (props: Props) => {
 
   const [isSignUp, setIsSignUp] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (error) {
       Alert.alert("An error occured!", error, [
         { text: "OK", style: "default" },
       ]);
     }
-  },[error]);
+  }, [error]);
 
   const dispatch = useDispatch();
 
   const inputChangeHandler = useCallback(
     (value: string, isValid: boolean, input: string) => {
-      console.log(`updating form for ${input} validity is ${isValid}`);
+   
       formStateDispatch({
         type: FORM_INPUT_UPDATE,
         input,
@@ -113,7 +113,7 @@ const AuthScreen= (props: Props) => {
   );
 
   const authHandler = async () => {
-    // console.log(`auth handler ${JSON.stringify(state)}`);
+
 
     if (!state.isFormValid) {
       Alert.alert(
@@ -139,12 +139,20 @@ const AuthScreen= (props: Props) => {
 
     try {
       await dispatch(action);
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "New Sign In",
+          body: "There has been a new Sign in ShopApp using your account!",
+        },
+        trigger: {
+          seconds: 5,
+        },
+      });
       // props.navigation.navigate("Shop",{})
     } catch (err) {
       setError(err.message);
       setIsLoading(false);
     }
-    
   };
 
   const switchModeHandler = () => {
@@ -213,7 +221,7 @@ const AuthScreen= (props: Props) => {
   );
 };
 
-export const AuthScreenNavigationOptions = (navigationData:any) => {
+export const AuthScreenNavigationOptions = (navigationData: any) => {
   return {
     headerTitle: "Login",
   };

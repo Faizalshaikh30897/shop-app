@@ -1,15 +1,17 @@
-import { AuthActionType, AUTHENTICATE, LOGIN, LOGOUT, SET_DID_TRY_AL, SIGN_UP } from "../actions/Auth";
+import { AuthActionType, AUTHENTICATE, LOGIN, LOGOUT, SET_DID_TRY_AL, SET_EXPO_TOKEN, SIGN_UP } from "../actions/Auth";
 
 export interface AuthState {
   token: string | null;
   userId: string | null;
   didTryAutoLogin: boolean;
+  expoToken: string | null;
 }
 
 const initialState: AuthState = {
   token: null,
   userId: null,
-  didTryAutoLogin: false
+  didTryAutoLogin: false,
+  expoToken: null
 };
 
 export const authReducer = (
@@ -39,6 +41,11 @@ export const authReducer = (
       return {
         ...state,
         didTryAutoLogin: true
+      }
+    case SET_EXPO_TOKEN:
+      return {
+        ...state,
+        expoToken: action.expoToken
       }
     default:
       return state;

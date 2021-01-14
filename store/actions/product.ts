@@ -55,14 +55,15 @@ export const addProduct = (
               description: product.description,
               imageUrl: product.imageUrl,
               price: product.price,
-              ownerId: userId
+              ownerId: userId,
+              pushToken: getState().auth.expoToken
             }),
           }
         );
 
         if (!apiResponse.ok) {
           const errorData = await apiResponse.json();
-          console.log(`Error api data, ${JSON.stringify(errorData)}`);
+          // console.log(`Error api data, ${JSON.stringify(errorData)}`);
           throw new Error("Something went wrong");
         }
 
@@ -76,7 +77,8 @@ export const addProduct = (
             product.title,
             product.imageUrl,
             product.description,
-            product.price
+            product.price,
+            getState().auth.expoToken
           ),
         });
       } else {
@@ -126,7 +128,8 @@ export const editProduct = (
             product.title,
             product.imageUrl,
             product.description,
-            product.price
+            product.price,
+            product.ownerToken
           ),
         });
       } else {
@@ -154,7 +157,7 @@ export const deleteProduct = (
 
         if (!apiResponse.ok) {
           const errorData = await apiResponse.json();
-          console.log(`Error api data, ${JSON.stringify(errorData)}`);
+          // console.log(`Error api data, ${JSON.stringify(errorData)}`);
           throw new Error("Something went wrong");
         }
 
@@ -188,13 +191,13 @@ export const fetchProducts = (): ThunkAction<
 
       if (!apiResponse.ok) {
         const errorData = await apiResponse.json();
-        console.log(`Error api data, ${JSON.stringify(errorData)}`);
+        // console.log(`Error api data, ${JSON.stringify(errorData)}`);
         throw new Error("Something went wrong!");
       }
 
       const data = await apiResponse.json();
 
-      console.log(`get response ${JSON.stringify(data)}`);
+      // console.log(`get response ${JSON.stringify(data)}`);
 
       const loadedProducts: Product[] = [];
 
@@ -206,7 +209,9 @@ export const fetchProducts = (): ThunkAction<
             data[key].title,
             data[key].imageUrl,
             data[key].description,
-            data[key].price
+            data[key].price,
+            data[key].pushToken
+         
           )
         );
       }

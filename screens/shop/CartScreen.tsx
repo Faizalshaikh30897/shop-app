@@ -36,6 +36,7 @@ const CartScreen = (props: Props) => {
         quantity: value.quantity,
         productTitle: value.productTitle,
         sum: value.sum,
+        productOwnerToken: value.productOwnerToken
       });
     });
 
@@ -71,10 +72,11 @@ const CartScreen = (props: Props) => {
         })
       );
       await dispatch(emptyCart());
-      setIsLoading(false);
+      
     } catch (err) {
       setError(err.message);
     }
+    setIsLoading(false);
   };
   if (isLoading) {
     return (

@@ -1,4 +1,3 @@
-import PRODUCTS from "../../data/dummy";
 import Product from "../../models/Product";
 import {
   ADD_PRODUCT,
@@ -27,8 +26,8 @@ export const productReducer = (
       return {
         ...state,
         availableProducts: action.products,
-        userProducts: action.userProducts
-      }
+        userProducts: action.userProducts,
+      };
     case DELETE_PRODUCT:
       return {
         ...state,

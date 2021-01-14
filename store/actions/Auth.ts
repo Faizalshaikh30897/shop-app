@@ -7,7 +7,8 @@ export const SIGN_UP = "SIGN_UP";
 export const LOGIN = "LOGIN";
 export const AUTHENTICATE = "AUTHENTICATE";
 export const LOGOUT = "LOGOUT";
-export const SET_DID_TRY_AL = "SET_DID_TRY_AL"; 
+export const SET_DID_TRY_AL = "SET_DID_TRY_AL";
+export const SET_EXPO_TOKEN = "SET_EXPO_TOKEN";
 
 let timer: NodeJS.Timeout;
 
@@ -31,7 +32,11 @@ interface AuthenticateAction {
 
 interface SetDidTryALAction {
   type: typeof SET_DID_TRY_AL;
-  
+}
+
+interface SetExpoTokenAction {
+  type: typeof SET_EXPO_TOKEN;
+  expoToken: string | null;
 }
 
 interface LogoutAction {
@@ -43,7 +48,8 @@ export type AuthActionType =
   | LoginAction
   | AuthenticateAction
   | LogoutAction
-  | SetDidTryALAction;
+  | SetDidTryALAction
+  | SetExpoTokenAction;
 
 const APIKey = "AIzaSyDOcJto57RzDgLbCpX1cS0OWm_pBnYbzLc";
 
@@ -67,10 +73,10 @@ export const signup = (
           }),
         }
       );
-      console.log(`responose, ${JSON.stringify(response)}`);
+   
       if (!response.ok) {
         const errorData = await response.json();
-        console.log(`Error data api, ${JSON.stringify(errorData)}`);
+       // console.log(`Error data api, ${JSON.stringify(errorData)}`);
         const errorCode = errorData.error.message;
         let errorMessage = "Something went wrong!";
         if (errorCode === "EMAIL_EXISTS") {
@@ -80,13 +86,13 @@ export const signup = (
       }
 
       const data = await response.json();
-      console.log(JSON.stringify(data));
+      //console.log(JSON.stringify(data));
 
       dispatch({ type: SIGN_UP, tokenId: data.idToken, userId: data.localId });
       const expirationDate = new Date(
         new Date().getTime() + Number(data.expiresIn) * 1000
       );
-      dispatch(setLogoutTimer( Number(data.expiresIn) * 1000));
+      dispatch(setLogoutTimer(Number(data.expiresIn) * 1000));
       saveDataToStorage(data.idToken, data.localId, expirationDate);
     } catch (err) {
       console.log(err.message);
@@ -115,10 +121,10 @@ export const login = (
           }),
         }
       );
-      console.log(`responose, ${JSON.stringify(response)}`);
+      // console.log(`responose, ${JSON.stringify(response)}`);
       if (!response.ok) {
         const errorData = await response.json();
-        console.log(`Error data api, ${JSON.stringify(errorData)}`);
+        // console.log(`Error data api, ${JSON.stringify(errorData)}`);
         const errorCode = errorData.error.message;
         let errorMessage = "Something went wrong!";
         if (errorCode === "EMAIL_NOT_FOUND") {
@@ -130,13 +136,13 @@ export const login = (
       }
 
       const data = await response.json();
-      console.log(JSON.stringify(data));
-      
+      // console.log(JSON.stringify(data));
+
       dispatch({ type: LOGIN, tokenId: data.idToken, userId: data.localId });
       const expirationDate = new Date(
         new Date().getTime() + Number(data.expiresIn) * 1000
       );
-      dispatch(setLogoutTimer( Number(data.expiresIn) * 1000));
+      dispatch(setLogoutTimer(Number(data.expiresIn) * 1000));
       saveDataToStorage(data.idToken, data.localId, expirationDate);
     } catch (err) {
       console.log(err.message);
@@ -149,15 +155,15 @@ export const authenticate = (
   token: string,
   userId: string,
   expiryTime: number
-): ThunkAction <void,RootState,unknown,AuthenticateAction> => {
-  return (dispatch: any) =>{
+): ThunkAction<void, RootState, unknown, AuthenticateAction> => {
+  return (dispatch: any) => {
     dispatch({
       type: AUTHENTICATE,
       tokenId: token,
       userId,
     });
     dispatch(setLogoutTimer(expiryTime));
-  }
+  };
 };
 
 export const logout = (): LogoutAction => {
@@ -166,11 +172,25 @@ export const logout = (): LogoutAction => {
   return { type: LOGOUT };
 };
 
-export const setDidTryAL = () : SetDidTryALAction =>{
+export const setDidTryAL = (): SetDidTryALAction => {
   return {
-    type: SET_DID_TRY_AL
-  }
-}
+    type: SET_DID_TRY_AL,
+  };
+};
+
+export const setExpoToken = (expoToken: string): SetExpoTokenAction => {
+  if (expoToken)
+    AsyncStorage.setItem(
+      "expoToken",
+      JSON.stringify({
+        expoToken,
+      })
+    );
+  return {
+    type: SET_EXPO_TOKEN,
+    expoToken,
+  };
+};
 
 const setLogoutTimer = (expiryTime: number) => {
   return (dispatch: any) => {

@@ -1,4 +1,4 @@
-import PRODUCTS from "../../data/dummy";
+
 import CartItem from "../../models/CartItem";
 import {
   ADD_TO_CART,
@@ -37,7 +37,8 @@ export const cartReducer = (
             oldItem.quantity + 1,
             productToAdd.title,
             productToAdd.price,
-            oldItem.sum + productToAdd.price
+            oldItem.sum + productToAdd.price,
+            productToAdd.ownerToken,
           )
         );
       } else {
@@ -47,7 +48,8 @@ export const cartReducer = (
             1,
             productToAdd.title,
             productToAdd.price,
-            productToAdd.price
+            productToAdd.price,
+            productToAdd.ownerToken,
           )
         );
       }

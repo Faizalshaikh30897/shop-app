@@ -146,11 +146,12 @@ export const ShopNavigator = () => {
       drawerContent={(props) => {
         
         return (
-          <View style={{ flex: 1, paddingVertical: 20 }}>
+          <View style={{ flex: 1, paddingVertical: 25 }}>
             {/* forceInset={{top:'always', horizontal: "never"}} */}
             <SafeAreaView>
               <DrawerItemList {...props} />
               <Button
+                color={COLORS.accent}
                 title="Logout"
                 onPress={() => {
                   dispatch(logout());

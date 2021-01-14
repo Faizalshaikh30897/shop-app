@@ -3,6 +3,8 @@ export default class CartItem {
     public quantity: number,
     public productTitle: string,
     public productPrice: number,
-    public sum: number
+    public sum: number,
+    public productOwnerToken: string| null,
+   
   ) {}
 }

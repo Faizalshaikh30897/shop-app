@@ -24,6 +24,7 @@ export const placeOrder = (
     try {
       const token = getState().auth.token;
       const userId = getState().auth.userId;
+      const expoToken = getState().auth.expoToken;
       if (token && userId) {
         const dateField = new Date();
         const apiResponse = await fetch(
@@ -43,11 +44,77 @@ export const placeOrder = (
 
         if (!apiResponse.ok) {
           const errorData = await apiResponse.json();
-          console.log(`Error api data, ${JSON.stringify(errorData)}`);
+          // console.log(`Error api data, ${JSON.stringify(errorData)}`);
           throw new Error("Something went wrong");
         }
 
         const data = await apiResponse.json();
+        console.log(`Expo token ${expoToken}`);
+        if (expoToken) {
+          try{
+
+          
+          const notificationResposne = await fetch(
+            `https://exp.host/--/api/v2/push/send`,
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Accept-Encoding": "gzip, deflate",
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                to: expoToken,
+                data: {
+                  extraData: "Some data",
+                },
+                title: "Order Placed!",
+                body: `You have successfully placed an order of $${order.totalAmount} , Check orders tab for details!`,
+              }),
+            }
+          );
+          const notificationData = await notificationResposne.json();
+          // console.log(`Send notification response, ${JSON.stringify(notificationData)}`);
+          }
+          catch(err){
+            console.log(`Error sending notification to user ${err.message}`);
+          }
+
+        }
+
+        for(const item of order.cartItems){
+          if(item.productOwnerToken){
+            try{
+
+          
+              const notificationResposne = await fetch(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Content-type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    to: item.productOwnerToken,
+                    data: {
+                      extraData: item,
+                    },
+                    title: "You Recieved an order!",
+                    body: `You have recieved an order of ${item.quantity} ${item.productTitle}(s) worth $${item.sum}`,
+                  }),
+                }
+              );
+              const notificationData = await notificationResposne.json();
+              // console.log(`Send notification response, ${JSON.stringify(notificationData)}`);
+              }
+              catch(err){
+                console.log(`Error sending notification to seller ${err.message}`);
+              }
+    
+          }
+        }
 
         dispatch({
           type: PLACE_ORDER,
@@ -83,7 +150,7 @@ export const fetchOrders = (): ThunkAction<
 
         if (!apiResponse.ok) {
           const errorData = await apiResponse.json();
-          console.log(`Error api data, ${JSON.stringify(errorData)}`);
+          // console.log(`Error api data, ${JSON.stringify(errorData)}`);
           throw new Error("Something went wrong");
         }
 
@@ -100,7 +167,7 @@ export const fetchOrders = (): ThunkAction<
               data[key].totalAmount
             )
           );
-          console.log(JSON.stringify(loadedOrders));
+          // console.log(JSON.stringify(loadedOrders));
         }
 
         dispatch({

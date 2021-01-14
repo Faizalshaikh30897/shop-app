@@ -4,6 +4,8 @@ export default class CartItemDetail {
     public quantity: number,
     public productTitle: string,
     public productPrice: number,
-    public sum: number
+    public sum: number,
+    public productOwnerToken: string | null,
+  
   ) {}
 }
